@@ -1,0 +1,1026 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font
+import tkinter.font as tkfont
+import requests
+import os
+import subprocess
+import re
+from PIL import Image, ImageTk
+from io import BytesIO
+from tkinter import messagebox
+
+
+
+
+comparision_operator = ["exactly", "equals", "does not equal", "matches regex", "does not match regex",  "is blank", "is not blank", "is any of", "is none of",
+                        "contains any of", "doesn't contain any of", "includes value", "doesn't include value", "matches regex", "has a value",
+                        "is empty", "includes any of", "includes none of", "values contain any of", "values don't contain any of", "is all of", "isn't all of" ,
+                        "after", "less than", "before","more than", "is not blank","is blank","in less than","in more than"]
+
+blanksvalues = ["is blank", "is not blank", "has a value", "is empty"]
+MsaCountryDictionary = {"Standard16": ["CO","UK","CA","AU","FR","DE","ES","MX","IN","HK","ZA","IT","US","NL","BR"],
+                        "Cloud":["DE", "AU", "CA", "GB", "US", "ES", "MX", "CA", "FR", "IT", "NL", "PT"],
+                        "Rewards":["DE", "AU", "CA", "GB", "HK", "US", "ES", "MX", "FR", "IT", "NL", "PT"],
+                        "English":["AU", "CA", "GB", "US", "HK", "ZA", "IN"]}
+
+BrazeAttributesDictionary = {
+"EmailDomain": ["microsoft", "hotmail", "msn", "live", "outlook", "xyz"],
+"ConsolePurchasers": ["SeriesS", "SeriesX"],
+"ConsolePlayedinLast12Month": ["X360", "XboxOne", "XboxOneS", "XboxOneX", "XboxSeriesS", "XboxSeriesX"],
+"ConsolePlayedinLast6Month": ["X360", "XboxOne", "XboxOneS", "XboxOneX", "XboxSeriesS", "XboxSeriesX"],
+"PrevSubscriptionType": ["Ultimate","PC Game Pass","XGPStandard","Core","Pass", "EA Access"],
+"CurrentSubscriptionType": ["Ultimate","PC Game Pass","XGPStandard","Core","Pass"],
+"SubscriptionPaymentStatus": ["Free Promo", "Free Trail", "Full Paid", "Paid Promo"],
+"GenrePlayedIn12Month": ["ActionAndAdventure","CardAndBoard","Casino","Classics","Education","Entertainment","Family & kids","Games","Kinect","Lifestyle",
+                         "MultiPlayerOnlineBattleArena","Music","Platformer","PuzzleAndTrivia","RacingFlying","RolePlaying","Social","Special interest",
+                         "Sports","Strategy","UNKNOWN","Xbox 360 exclusives","Companion","Fighting","Other","Shooter","Simulation","Tools","Word"],
+"PC_Acquisition": ["Low","Medium","High"],
+"Scarlett_ChurnModelSeries_S": ["High","Medium","Low"],
+"Scarlett_ChurnModelSeries_X": ["High","Medium","Low"],
+"SubjectLineModel": ["Playful","Informative"],
+"Silver_to_Ultimate": ["High","Medium","Low"],
+"Gold_to_Ultimate": ["High","Medium","Low"],
+"PC_GP_Churn_Model": ["High","Medium","Low"],
+"Ultimate_Churn_model": ["High","Medium","Low"],
+"Controller_Propensity": ["Very High", "High", "Medium", "Low"],
+"Scarlett_Acquisition_Model_Series_S": ["Very Likely", "Likely", "Unlikely", "Very Unlikely"],
+"Scarlett_Acquisition_Model_Series_X": ["Very Likely", "Likely", "Unlikely", "Very Unlikely"],
+"COD_Players": ["0-14","15-30","31-60","61-90","91-180","181-365","366+"],
+"Avowed_Players": ["0-14", "15-30", "31-60", "61+"],
+"DOOM_Players": ["0-7", "8-14", "15-30",  "31-60", "61-90", "91-180", "181-365", "366+"],
+"XCloudFortnite30DayPlayers": ["0-2", "2-5", "5-10", "10+"],
+"AgeGroup": ["12+", "0-11" ,"16+","17+","18+","Unknown"],
+"FH4PlayedHours":["0-2","3-9","10+"],
+"Locale":["de-DE","en-AU","en-CA","en-GB","en-HK","en-IN","en-US","en-ZA","es-CO","es-ES","es-MX","fr-CA","fr-FR","it-IT","nl-NL","pt-BR"]
+}
+
+DateTimeAttributes = ["AccountCreatedDate",
+"AllaccessProcessedDate",
+"CoreGPPageVisitedDateId",
+"CoreSubscription_CancelDate",
+"CurrSubscriptionEndDateTime",
+"CurrSubscriptionStartDateTime",
+"FH5ConsoleFirstPlayedDate",
+"FH5ConsoleLastPlayedDate",
+"FH5LastPlayedDate",
+"FH5PCFirstPlayedDate",
+"FirstPlayedDate_AOE4_Win",
+"FirstPlayedDate_AOEII_DE",
+"FirstseenonXboxMobileapp",
+"FirstseenonXboxPCapp",
+"LastBingSearchEarnedDate",
+"LastPlayedDate_ViaCoreSubs",
+"LastPlayedDate_ViaPCGPSubs",
+"LastPlayedDate_ViaStandardSubs",
+"LastPlayedDate_ViaUltimateSubs",
+"LastPurchaseDatetime",
+"LastStorePurchaseEarnedDate",
+"LastseenonXboxMobileapp",
+"LastseenonXboxPCapp",
+"MarketingPrefModifiedDate",
+"PCGPPageVisitedDateId",
+"PCOfferPagevisitedDateId",
+"PCSubscription_CancelDate",
+"PrevCoreEndDate",
+"PrevPCEndDate",
+"PrevPassEndDate",
+"PrevSubscriptionEndDate",
+"PrevSubscriptionStartDate",
+"PrevUltimateEnddate",
+"PrevXGPStandardEndDate",
+"RewardSignupDate",
+"SOT_FirstPlaydate",
+"SOT_FirstPurchaseDate",
+"SeriesSPageVisitedDateId",
+"SeriesXPageVisitedDateId",
+"SkyrimFirstPlayedDate",
+"StandardSubscription_CancelDate",
+"UltimateGPPageVisitedDateId",
+"UltimateSubscription_CancelDate",
+"X360FirstSeenDateTime",
+"XAAPageVisitedDateId",
+"XboxOneFirstConsoleLoginDate",
+"XboxOneSFirstConsoleLoginDate",
+"XboxOneXFirstConsoleLoginDate",
+"XboxSeriesSFirstConsoleLoginDate",
+"XboxSeriesXFirstConsoleLoginDate"
+]
+
+CampaignTypeDictionary = {
+"Promotional": ["email subscription status is opted_in", "email address is not blank", "AgeGroup equals 18+", "IsPromoEligible equals True",
+                       "AccountCreatedDate is more than 6 days ago"],
+"Transactional": ["IsPromoEligible equals True", "email address is not blank", 'is not in Subscription Group "RedAlert"',"AgeGroup equals 18+"],
+"Contactable": ["email subscription status is opted_in", "email address is not blank", "AgeGroup equals 18+", "IsPromoEligible equals True"]
+}
+
+
+DateTimeAttributes = ["AccountCreatedDate",
+"AllaccessProcessedDate",
+"CoreGPPageVisitedDateId",
+"CoreSubscription_CancelDate",
+"CurrSubscriptionEndDateTime",
+"CurrSubscriptionStartDateTime",
+"FH5ConsoleFirstPlayedDate",
+"FH5ConsoleLastPlayedDate",
+"FH5LastPlayedDate",
+"FH5PCFirstPlayedDate",
+"FirstPlayedDate_AOE4_Win",
+"FirstPlayedDate_AOEII_DE",
+"FirstseenonXboxMobileapp",
+"FirstseenonXboxPCapp",
+"LastBingSearchEarnedDate",
+"LastPlayedDate_ViaCoreSubs",
+"LastPlayedDate_ViaPCGPSubs",
+"LastPlayedDate_ViaStandardSubs",
+"LastPlayedDate_ViaUltimateSubs",
+"LastPurchaseDatetime",
+"LastStorePurchaseEarnedDate",
+"LastseenonXboxMobileapp",
+"LastseenonXboxPCapp",
+"MarketingPrefModifiedDate",
+"PCGPPageVisitedDateId",
+"PCOfferPagevisitedDateId",
+"PCSubscription_CancelDate",
+"PrevCoreEndDate",
+"PrevPCEndDate",
+"PrevPassEndDate",
+"PrevSubscriptionEndDate",
+"PrevSubscriptionStartDate",
+"PrevUltimateEnddate",
+"PrevXGPStandardEndDate",
+"RewardSignupDate",
+"SOT_FirstPlaydate",
+"SOT_FirstPurchaseDate",
+"SeriesSPageVisitedDateId",
+"SeriesXPageVisitedDateId",
+"SkyrimFirstPlayedDate",
+"StandardSubscription_CancelDate",
+"UltimateGPPageVisitedDateId",
+"UltimateSubscription_CancelDate",
+"X360FirstSeenDateTime",
+"XAAPageVisitedDateId",
+"XboxOneFirstConsoleLoginDate",
+"XboxOneSFirstConsoleLoginDate",
+"XboxOneXFirstConsoleLoginDate",
+"XboxSeriesSFirstConsoleLoginDate",
+"XboxSeriesXFirstConsoleLoginDate"
+]
+
+AllAttributes = ["AccountCreatedDate",
+"AgeGroup",
+"AllaccessProcessedDate",
+"Anchor",
+"Anchor_Tag",
+"Avid_Gamer",
+"Avowed_Players",
+"Avowed_purchaseres",
+"Backfeed_Users",
+"CLV_Revenue_Gold_yr1",
+"CLV_Revenue_PCGP_yr1",
+"CLV_Revenue_Transaction_1P_yr1",
+"CLV_Revenue_UltimateGP_yr1",
+"CODVault_Purchaser",
+"COD_Players",
+"COD_Purchasers",
+"ConsolePlayedinLast12Month",
+"ConsolePlayedinLast6Month",
+"ConsolePurchasers",
+"Controller_Propensity",
+"CoreGPPageVisitedDateId",
+"CoreSubscription_CancelDate",
+"CurrMonth_GamerScore",
+"CurrMonth_Top3Games",
+"CurrSubscriptionEndDateTime",
+"CurrSubscriptionStartDateTime",
+"CurrentMonthPointsEarned",
+"CurrentSubscriptionType",
+"DOOM_Players",
+"DOOM_Purchasers",
+"DaySinceLastPlayed",
+"DaySinceLastPlayedOnConsole",
+"DaySinceLastPlayedOnPC",
+"DaysPlayedBy_NewFMSPlayer",
+"DaysPlayedBy_NewFMS_MP",
+"DurationInMonths",
+"Earned_Avowed_achievement",
+"Eligible_Campaign",
+"EmailDomain",
+"FH4PlayedHours",
+"FH5Achievments",
+"FH5ConsoleFirstPlayedDate",
+"FH5ConsoleLastPlayedDate",
+"FH5LastPlayedDate",
+"FH5PCFirstPlayedDate",
+"FH5WelcomePackPurchasers",
+"FIGPCGPPicksForYou",
+"FIGPCGPPopularNearYou",
+"FIGPCGPTrending",
+"FIGUltimatePicksForYou",
+"FIGXGPPicksForYou",
+"FIGXboxPicksForYou",
+"FIGXboxPopularwithFriends",
+"FMSAddons_Purchasers",
+"FMS_5to7VersionPlayers",
+"Fincastle_GeneralEligible",
+"FirstPartyOptIn",
+"FirstPlayedDate_AOE4_Win",
+"FirstPlayedDate_AOEII_DE",
+"FirstseenonXboxMobileapp",
+"FirstseenonXboxPCapp",
+"GP_TitlesPlayed_NotPurchased",
+"GamerPic",
+"GamerScore",
+"GamerTag",
+"GenrePlayedIn12Month",
+"GoalSKUTitle",
+"Gold_to_Ultimate",
+"HasAccessory",
+"HasBouncedEmailAddress",
+"HasChildAccountAssosciated",
+"HasMSCompleteXbox",
+"HasXboxFamily",
+"HoursPlayedBy_NewFMSPlayer",
+"IPGeoState",
+"IPGeoState_Quebec",
+"IsAutoRenew",
+"IsCOD_BO6_AchievementAchieved",
+"IsCurrentFortniteCrewMember",
+"IsFincastlePreselected",
+"IsMasterCardUser",
+"IsParent",
+"IsPromoEligible",
+"IsRewardsMember",
+"IsSoftBounceUser",
+"IsTargetedHighAvgApprovalProbabilityUser",
+"IsUltimateChurner",
+"IsUserInUK",
+"IsUserInUKRound2",
+"Is_Doom_AchievementAchieved",
+"Is_XSF_User",
+"LTV_CoreGP",
+"LTV_PCGP",
+"LTV_Transaction",
+"LTV_UltimateGP",
+"LastBingSearchEarnedDate",
+"LastMonthPointsEarned",
+"LastMonthSearchCount",
+"LastMonthSearchPoints",
+"LastMonthStorePoints",
+"LastMonthXboxAppPointsEarned",
+"LastPlayedDate_ViaCoreSubs",
+"LastPlayedDate_ViaPCGPSubs",
+"LastPlayedDate_ViaStandardSubs",
+"LastPlayedDate_ViaUltimateSubs",
+"LastPlayedTitleId",
+"LastPurchaseDatetime",
+"LastStorePurchaseEarnedDate",
+"LastseenonXboxMobileapp",
+"LastseenonXboxPCapp",
+"LifetimeEarnedPoints",
+"LifetimeRedeemedPoints",
+"Locale",
+"MarketingPrefModifiedDate",
+"MonthsSinceLastResponded",
+"MsaCountry",
+"NumberOfFriends",
+"PCGPPageVisitedDateId",
+"PCGPPicksForYou",
+"PCOfferPagevisitedDateId",
+"PCSubscription_CancelDate",
+"PC_Acquisition",
+"PC_GP_Churn_Model",
+"PrevCoreEndDate",
+"PrevPCEndDate",
+"PrevPassEndDate",
+"PrevSubscriptionEndDate",
+"PrevSubscriptionStartDate",
+"PrevSubscriptionType",
+"PrevUltimateEnddate",
+"PrevXGPStandardEndDate",
+"PurchasePriceUSDAmount",
+"ROGXboxAllyOptInNotification",
+"RevenueSku",
+"RewardCurrentAvailableBalance",
+"RewardMonthSinceLastRedemption",
+"RewardSignupDate",
+"SOT_CPMOptin",
+"SOT_FirstPlaydate",
+"SOT_FirstPurchaseDate",
+"Scarlett_Acquisition_Model_Series_S",
+"Scarlett_Acquisition_Model_Series_X",
+"Scarlett_ChurnModelSeries_S",
+"Scarlett_ChurnModelSeries_X",
+"SeriesSPageVisitedDateId",
+"SeriesXPageVisitedDateId",
+"Silver_to_Ultimate",
+"SkyrimFirstPlayedDate",
+"StandardSubscription_CancelDate",
+"SubjectLineModel",
+"SubscriptionDurationType",
+"SubscriptionPaymentStatus",
+"Subscription_Status",
+"Top3Games_Last30days",
+"Top50Percent_PlayerOnPC",
+"UltimateGPPageVisitedDateId",
+"UltimatePicksForYou",
+"UltimateSubscription_CancelDate",
+"Ultimate_Churn_model",
+"UnsubscribeUrl",
+"VisitedCoreGamePassPage",
+"VisitedPCGPPage",
+"VisitedPCOfferPassPage",
+"VisitedSeriesSPage",
+"VisitedSeriesXPage",
+"VisitedUltimateGPPage",
+"VisitedXAAPage",
+"X360FirstSeenDateTime",
+"X360MonthsSinceLastLogin",
+"XAAPageVisitedDateId",
+"XAA_Series_S_Propensity",
+"XAA_Series_X_Propensity",
+"XCloudFortnite30DayPlayers",
+"XCloudFortniteUsers",
+"XGPPicksForYou",
+"XboxOneFirstConsoleLoginDate",
+"XboxOneMonLogin",
+"XboxOneMonthsSinceLastLogin",
+"XboxOneSFirstConsoleLoginDate",
+"XboxOneSMonthsSinceLastLogin",
+"XboxOneXFirstConsoleLoginDate",
+"XboxOneXMonthsSinceLasSinceLastLogin",
+"XboxOneXMonthsSinceLastLogin",
+"XboxPicksForYou",
+"XboxPopularwithFriends",
+"XboxSeriesSFirstConsoleLoginDate",
+"XboxSeriesSMonthsSinceLastLogin",
+"XboxSeriesSMornal_id",
+"XboxSeriesXFirstConsoleLoginDate",
+"XboxSeriesXMonthsSinceLastLogin",
+"Zuid",
+"attributes",
+"custom_attribute_key",
+"isHighPropensityMasterCard"
+]
+        
+
+
+
+        
+
+
+
+def extract_logical_blocks(text):
+    lines = text.splitlines()
+
+    blocks = []
+    current_block = []
+    paren_balance_outer = 0
+    collecting_outer = False
+    collecting_inner = False
+
+    for line in lines:
+
+
+        if line.startswith("Description:"):
+            if current_block:
+                blocks.append(current_block)
+            current_block = [line]
+            paren_balance_outer = line.count('(') - line.count(')')
+            collecting_outer = True
+            continue
+
+        if collecting_outer:
+            paren_balance_outer += line.count('(') - line.count(')')
+
+            stripped_lower = line.lower()
+            starts_inner_block = (
+                stripped_lower.startswith("or (") or
+                stripped_lower.startswith("and (") or
+                stripped_lower.startswith("and not (")
+            )
+
+            if starts_inner_block and current_block and len(current_block) > 0:
+                blocks.append(current_block)
+                current_block = [line]
+            else:
+                current_block.append(line)
+
+            if paren_balance_outer == 0:
+                if current_block:
+                    blocks.append(current_block)
+                current_block = []
+                collecting_outer = False
+
+        else:
+            stripped_lower = line.lower()
+            if (stripped_lower.startswith("or (") or
+                stripped_lower.startswith("and (") or
+                stripped_lower.startswith("and not (")):
+                if current_block:
+                    blocks.append(current_block)
+                current_block = [line]
+                paren_balance_inner = line.count('(') - line.count(')')
+                collecting_inner = True
+                continue
+
+            if collecting_inner:
+                current_block.append(line)
+                paren_balance_inner += line.count('(') - line.count(')')
+                if paren_balance_inner == 0:
+                    blocks.append(current_block)
+                    current_block = []
+                    collecting_inner = False
+            else:
+                continue
+
+    if current_block:
+        blocks.append(current_block)
+
+    return blocks
+
+def remove_first_and_last_paren(lines):
+    for i, line in enumerate(lines):
+        if '(' in line:
+            lines[i] = line.replace('(', '', 1)
+            break
+    for i in range(len(lines) - 1, -1, -1):
+        if ')' in lines[i]:
+            line = lines[i]
+            reversed_line = line[::-1]
+            reversed_line = reversed_line.replace(')', '', 1)
+            lines[i] = reversed_line[::-1]
+            break
+
+    return lines
+
+
+
+def fileandterminal(message, file, output_widget):
+    output_widget.insert(tk.END, message + '\n')
+    output_widget.see(tk.END)
+    print(message, file=file)
+
+    
+def get_segment_details(api_key, segment_id):
+    url = f"https://rest.iad-05.braze.com/segments/details?segment_id={segment_id}"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"error": response.status_code, "message": response.text}
+
+
+
+
+def analyze_segment():
+    #run_button.config(state="disabled")
+    campaign_type = campaign_type_var.get()
+    segment_id = segment_id_entry.get()
+    msacountry_type = msa_country_var.get()
+    Include_Eligible_Campaign_Values = IncludedEligibleCampaignValues.get("1.0", "end").strip()
+    Exclude_Eligible_Campaign_Values = ExcludedEligibleCampaignValues.get("1.0", "end").strip()
+
+    api_key = "786ab5e2-2891-475c-8f19-fb9f7c4d139d"  
+    segment_id = segment_id_entry.get().strip()
+    output_text.delete('1.0', tk.END)
+    output_text.insert(tk.END, f"Campaign Type: {campaign_type_var.get()}\n")
+    output_text.insert(tk.END, f"Segment ID: {segment_id_entry.get()}\n")
+
+    if not segment_id:
+        output_text.insert(tk.END, "❌ Error: Please enter a Segment ID.\n")
+        return
+
+    output_text.insert(tk.END, f"🔄 Fetching segment details for ID: {segment_id}...\n")
+    
+    segment_details = get_segment_details(api_key, segment_id)
+    output_text.insert(tk.END, f"{segment_details}\n")
+    print(segment_details)
+    if 'error' in segment_details:
+        output_text.insert(tk.END, f"❌ API Error {segment_details['error']}: {segment_details['message']}\n")
+        return
+    
+
+
+
+
+    user_home = os.path.expanduser("~")
+    base_folder = os.path.join(user_home, "OneDrive - Microsoft", "Desktop", "BrazeSegmentQA")
+    segment_name = f"{segment_details['name']}" 
+    file_path = os.path.join(base_folder, segment_name)
+    os.makedirs(file_path, exist_ok=True) 
+    segmentdetails = "BrazeSegmentDetails.txt"
+    segmentQA = "QAFeedBack.txt"
+    DetailsFromBraze = os.path.join(file_path, segmentdetails)
+    QAFeedBack = os.path.join(file_path, segmentQA)
+    open(QAFeedBack, 'w', encoding="utf-8").close()
+
+    def format_text(text):
+        return re.sub(r'\b(and|or)\b', r'\n\1', text, flags=re.IGNORECASE)
+
+    with open(DetailsFromBraze, 'w', encoding='utf-8') as f:
+        description = segment_details.get('description', 'No description available')
+        formatted_description = format_text(description)
+        f.write(f"Description: {formatted_description}\n")
+
+    output_text.insert(tk.END, f"\n✅ Segment details saved to {DetailsFromBraze}\n\n")
+
+
+
+    with open(DetailsFromBraze, 'r', encoding='utf-8') as file:
+        text = file.read()
+        
+
+    eachblock = []
+    parts=text.split('and not ',1)
+    part1 = parts[0]
+    if not(part1.startswith('Description: (')):
+        eachblock.append(part1.splitlines())
+    else:
+        if part1:
+            if part1.startswith('Description: (('):
+                start = part1.find('(')
+                end = part1.rfind(')')
+                if start != -1 and end != -1 and start < end:
+                    part1 = part1[:start] + part1[start+1:end] + part1[end+1:]
+                dividingpart1 = extract_logical_blocks(part1)
+                for block in dividingpart1:
+                    block = remove_first_and_last_paren(block)
+                    eachblock.append(block)
+            
+            else:
+                dividingpart1 = extract_logical_blocks(part1)
+                for block in dividingpart1:
+                    block = remove_first_and_last_paren(block)
+                    eachblock.append(block)
+            
+        if len(parts)==2:
+            part2= 'and not '+parts[1]
+            if part2:
+                if part2.startswith('and not (('):
+                    start = part2.find('(')
+                    end = part2.rfind(')')
+                    if start != -1 and end != -1 and start < end:
+                        part2 = part2[:start] + part2[start+1:end] + part2[end+1:]
+                    dividingpart2 = extract_logical_blocks(part2)
+                    for block in dividingpart2:
+                        block = remove_first_and_last_paren(block)
+                        eachblock.append(block)
+                
+                else:
+                    dividingpart2 = extract_logical_blocks(part2)
+                    for block in dividingpart2:
+                        block = remove_first_and_last_paren(block)
+                        eachblock.append(block)
+
+
+
+    eachblock[-1][-1] = eachblock[-1][-1]+" "
+    exclusion_flag_set = False
+    
+    for blocknumber, blockcontent in enumerate(eachblock):
+        if blocknumber <len(eachblock):
+            is_exclusion = any(line.strip().lower().startswith('and not') for line in blockcontent)
+            if is_exclusion and not exclusion_flag_set:
+                with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                    fileandterminal("\n" + "*" * 25 + " EXCLUSION GROUP " + "*" * 25, file, output_text)
+                    fileandterminal(f"\n{'*' * 15} BLOCK {blocknumber + 1} {'*' * 15}\n", file, output_text)
+
+                exclusion_flag_set = True
+            else:
+                with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                    fileandterminal(f"\n{'*' * 15} BLOCK {blocknumber + 1} {'*' * 15}\n", file, output_text)
+
+            simplifiedblock = []
+            for blockline in blockcontent:
+                if blockline.lower().startswith(('description: ', 'and ', 'or ','and not', '')):
+                    simplifiedline = (blockline.replace(f"Description: ", "").replace(f"and not ", "").replace('and ', '').replace('or ', ""))
+                    simplifiedblock.append(simplifiedline[:-1])    
+            count = 0
+            correctconditions = []
+            addtheseconditions = []
+            if campaign_type in CampaignTypeDictionary.keys():
+                campaigntypeconditions = CampaignTypeDictionary[campaign_type]
+                count = 0
+                for eachline in simplifiedblock:
+                    if eachline in campaigntypeconditions:
+                        count=count+1
+                        correctconditions.append(eachline)
+                    elif eachline and (eachline[0].lower() + eachline[1:]) in campaigntypeconditions:
+                        count=count+1
+                        correctconditions.append(eachline)
+                for each in campaigntypeconditions:
+                    if each not in correctconditions:
+                        addtheseconditions.append(each)
+                if not exclusion_flag_set:
+                    if count == len(campaigntypeconditions):
+                        with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                            fileandterminal(f"✅ All {campaign_type} Campaign conditions are present.", file, output_text)
+                            fileandterminal(f" Applied Conditions:", file, output_text)
+                            for num, each in enumerate(correctconditions):
+                                fileandterminal(f"{num + 1}. {each}", file, output_text)
+                            fileandterminal(f"\n", file, output_text)
+                            
+                    else:
+                        with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                            fileandterminal(f"❌ All {campaign_type} Campaign conditions are not present.", file, output_text)
+                            if len(correctconditions)>0:
+                                fileandterminal(f" Applied Conditions:", file, output_text)
+                                for num, each in enumerate(correctconditions):
+                                    fileandterminal(f"{num + 1}. {each}", file, output_text)
+                                fileandterminal(f"\n", file, output_text)
+                            if len(addtheseconditions)>0:
+                                fileandterminal(f"\n Missing Conditions:", file, output_text)
+                                for num, each in enumerate(addtheseconditions):
+                                    fileandterminal(f"{num + 1}. {each}", file, output_text)
+                                fileandterminal(f"\n", file, output_text)
+
+
+
+            
+            for line in simplifiedblock:
+                extractingvalues = ""
+                incorrectvalues = []
+                correctvalues = []
+                spacemodification = []
+                casemodification = []                           
+                spacecasemodification = []
+                brazestring = ""
+                comparekey = line.split(' ')[0]
+                if comparekey in DateTimeAttributes:
+                    datevalue = ""
+                    brazestring = (line.replace(f"{comparekey} ", ""))
+                    for operator in comparision_operator:
+                        if operator in brazestring:
+                            if operator in blanksvalues:
+                                datevalue = operator
+                            else:
+                                datevalue = brazestring.split(operator+" ", 1)[1]
+                            break
+                    
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌{comparekey}", file, output_text)
+                        fileandterminal(f"  -Comparision Operator: { operator}", file, output_text)
+                        if datevalue not in blanksvalues:
+                            fileandterminal(f"  -Provided Value: {datevalue}", file, output_text)    
+                        fileandterminal(f"\n", file, output_text)
+
+                
+                if comparekey  in BrazeAttributesDictionary.keys():
+                    isnovaluefound = ""
+                    comparevalues = BrazeAttributesDictionary[comparekey]
+                    brazestring = (line.replace(f"{comparekey} ", ""))
+                    for operator in comparision_operator:
+                        if operator in brazestring:
+                            if operator in blanksvalues:
+                                isnovaluefound = operator
+                            else:
+                                extractingvalues = brazestring.split(operator+" ", 1)[1].split(", ")
+                            break
+                    if isnovaluefound == "":
+                        for each in extractingvalues:
+                            if each in comparevalues:
+                                correctvalues.append(each.strip())
+                            else:
+                                incorrectvalues.append(each)
+                        for each in incorrectvalues:
+                            if each.strip() in comparevalues:
+                                spacemodification.append(each)
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌{comparekey}", file, output_text)
+                        fileandterminal(f"  -Comparision Operator: { operator}", file, output_text)
+                        if isnovaluefound != "":
+                            fileandterminal(f"  -Provided Value: {isnovaluefound}", file, output_text)    
+                        else:
+                            fileandterminal(f"  -Provided Values: {extractingvalues}", file, output_text)
+                            if correctvalues:
+                                fileandterminal(f"  -✅ Matching: {correctvalues}", file, output_text)
+                            if incorrectvalues:
+                                fileandterminal(f"  -❌ Non-Matching: {incorrectvalues}", file, output_text)
+                            if spacemodification:
+                                fileandterminal(f"  -Check the leading and lagging spaces for these values: {spacemodification}", file, output_text)
+                        fileandterminal(f"\n", file, output_text)
+
+
+                if comparekey in AllAttributes and comparekey not in BrazeAttributesDictionary.keys() and comparekey not in DateTimeAttributes and comparekey != "Eligible_Campaign" and comparekey != "MsaCountry":
+                    isnovaluefound = ""
+                    brazestring = (line.replace(f"{comparekey} ", ""))
+                    for operator in comparision_operator:
+                        if operator in brazestring:
+                            if operator in blanksvalues:
+                                isnovaluefound = operator
+                            else:
+                                extractingvalues = brazestring.split(operator+" ", 1)[1].split(", ")
+                            break
+                    if isnovaluefound == "":
+                        correctspacingvalues = []
+                        incorrectspacingvalues = []
+                        checkspacevalues = []
+                        for each in extractingvalues:
+                            if each.strip() == each:
+                                correctspacingvalues.append(each)
+                            else:
+                                incorrectspacingvalues.append(each)
+                        for each in incorrectspacingvalues:
+                            if each.startswith(" ") or each.endswith(" "):
+                                checkspacevalues.append(each)
+
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌{comparekey}", file, output_text)
+                        fileandterminal(f"  -Comparision Operator: { operator}", file, output_text)
+                        if isnovaluefound != "":
+                            fileandterminal(f"  -Provided Value: {isnovaluefound}", file, output_text)    
+                        else:
+                            fileandterminal(f"  -Provided Values: {extractingvalues}", file, output_text)
+                            if correctspacingvalues:
+                                fileandterminal(f"  -✅ No Space Issues: {correctspacingvalues}", file, output_text)
+                            if incorrectspacingvalues:
+                                fileandterminal(f"  -❌ Space Issues: {incorrectspacingvalues}", file, output_text)
+                            if checkspacevalues:
+                                fileandterminal(f"  -Check the leading and lagging spaces for these values: {checkspacevalues}", file, output_text)
+                        fileandterminal(f"\n", file, output_text)        
+                
+                if comparekey == "Eligible_Campaign":
+                    includeeligiblecampaignids = [x.strip() for x in Include_Eligible_Campaign_Values.split(",") if x.strip()]
+                    excludeeligiblecampaignids = [x.strip() for x in Exclude_Eligible_Campaign_Values.split(",") if x.strip()]
+                    
+                    isnovaluefound = ""
+                    brazestring = (line.replace(f"{comparekey} ", ""))
+                    for operator in comparision_operator:
+                        if operator in brazestring:
+                            if operator in blanksvalues:
+                                isnovaluefound = operator
+                            else:
+                                extractingvalues = brazestring.split(operator+" ", 1)[1].split(", ")
+                                
+                            break
+                    if isnovaluefound == "":
+                        if exclusion_flag_set:
+                            eligiblecampaignids = excludeeligiblecampaignids
+                        else:
+                            eligiblecampaignids = includeeligiblecampaignids
+                        
+                        for each in extractingvalues:
+                            if each in eligiblecampaignids:
+                                correctvalues.append(each.strip())
+                                
+                            else:
+                                incorrectvalues.append(each)
+                        for each in incorrectvalues:
+                            if str(each).strip() in eligiblecampaignids:
+                                spacemodification.append(each)
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌{comparekey}", file, output_text)
+                        fileandterminal(f"  -Comparision Operator: { operator}", file, output_text)
+                        if isnovaluefound != "":
+                            fileandterminal(f"  -Provided Value: {isnovaluefound}", file, output_text)    
+                        else:
+                            fileandterminal(f"  -Provided Values: {extractingvalues}", file, output_text)
+                            if correctvalues:
+                                fileandterminal(f"  -✅ Matching: {correctvalues}", file, output_text)
+                            if incorrectvalues:
+                                fileandterminal(f"  -❌ Non-Matching: {incorrectvalues}", file, output_text)
+                            if spacemodification:
+                                fileandterminal(f"  -Check the leading and lagging spaces for these values: {spacemodification}", file, output_text)
+                        fileandterminal(f"\n", file, output_text)
+                              
+                
+                if comparekey == "MsaCountry":
+                    isnovaluefound = ""
+                    if msacountry_type in MsaCountryDictionary.keys():
+                        comparevalues = MsaCountryDictionary[msacountry_type]
+                        brazestring = (line.replace(f"{comparekey} ", ""))
+                    for operator in comparision_operator:
+                        if operator in brazestring:
+                            if operator in blanksvalues:
+                                isnovaluefound = operator
+                            else:
+                                extractingvalues = brazestring.split(operator+" ", 1)[1].split(", ")
+                            break
+                    if isnovaluefound == "":
+                        for each in extractingvalues:
+                            if each in comparevalues:
+                                correctvalues.append(each.strip())
+                            else:
+                                incorrectvalues.append(each)
+                        for each in incorrectvalues:
+                            if each.strip() in comparevalues:
+                                spacemodification.append(each)
+                        for each in incorrectvalues:
+                            if '-' in each:
+                                part1 = each[:each.find('-')]
+                                part2 = each[each.find('-'):]
+                                part = part1.lower()+part2.upper()
+                                if part in comparevalues:
+                                    casemodification.append(each)
+                                else:
+                                    if part.strip() in comparevalues and each not in spacemodification:
+                                        spacecasemodification.append(each)
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌{comparekey}", file, output_text)
+                        fileandterminal(f"  -Comparision Operator: { operator}", file, output_text)
+                        if isnovaluefound != "":
+                            fileandterminal(f"  -Provided Value: {isnovaluefound}", file, output_text)    
+                        else:
+                            fileandterminal(f"  -Provided Values: {extractingvalues}", file, output_text)
+                            if correctvalues:
+                                fileandterminal(f"  -✅ Matching: {correctvalues}", file, output_text)
+                            if incorrectvalues:
+                                fileandterminal(f"  -❌ Non-Matching: {incorrectvalues}", file, output_text)
+                            if casemodification:
+                                fileandterminal(f"  -Check the casing for these values: {casemodification}", file, output_text)    
+                            if spacemodification:
+                                fileandterminal(f"  -Check the leading and lagging spaces for these values: {spacemodification}", file, output_text)
+                            if spacecasemodification:
+                                fileandterminal(f"  -Check the leading and lagging spaces and casing for these values: {spacecasemodification}", file, output_text)
+                        fileandterminal(f"\n", file, output_text)
+
+                        
+                
+                if "soft bounces" in line:
+                    if line == "has had more than 2 soft bounces in the last 30 calendar days (720-744 hours)":
+                        with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                            fileandterminal(f"✅Soft Bounce Exclusion Condition Correctly Present. i.e., has had more than 2 soft bounces in the last 30 calendar days (720-744 hours) ", file, output_text)
+                            fileandterminal(f"\n", file, output_text)
+                    else:
+                        with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                            fileandterminal(f"❌Soft Bounce Exclusion Condition Incorrect. It should be: has had more than 2 soft bounces in the last 30 calendar days (720-744 hours) ", file, output_text)
+                            fileandterminal(f"\n", file, output_text)
+                if "is in Segment" in line or "Is in Segment" in line:
+                    line = line.replace("Is in Segment", "is in Segment")
+                    segment = line.split("is in Segment",1)[1].strip()
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌Including Segment {segment}", file, output_text)
+                        fileandterminal(f"\n", file, output_text)
+                if "is not in Segment" in line or "Is not in Segment" in line:
+                    line = line.replace("Is not in Segment", "is not in Segment")
+                    segment = line.split("is not in Segment",1)[1].strip()
+                    with open(QAFeedBack, 'a', encoding="utf-8") as file:
+                        fileandterminal(f"📌Excluding Segment {segment}", file, output_text)
+                        fileandterminal(f"\n", file, output_text)
+
+
+
+
+
+
+    subprocess.Popen(["notepad.exe", DetailsFromBraze])
+    subprocess.Popen(["notepad.exe", QAFeedBack])
+#******************************************************** Graphically User Interface Setup **********************************************************   
+
+
+# --- Main Window ---
+root = tk.Tk()
+root.title("Braze Segment QA Tool")
+root.geometry("900x500")
+root.config(bg="#d3d3d3")
+
+bold_font = font.Font(weight="bold", size=10)
+
+# --- Logos ---
+ms_url = "https://msblogs.thesourcemediaassets.com/2012/08/8867.Microsoft_5F00_Logo_2D00_for_2D00_screen.jpg"
+braze_url = "https://d7umqicpi7263.cloudfront.net/img/product/2e0fe05e-7f82-491b-b10e-97a71109ec87.com/8188a46f7eb1dfae2306fe07815bd1f7"
+
+ms_logo = ImageTk.PhotoImage(Image.open(BytesIO(requests.get(ms_url).content)).resize((100, 30), Image.Resampling.LANCZOS))
+braze_logo = ImageTk.PhotoImage(Image.open(BytesIO(requests.get(braze_url).content)).resize((100, 30), Image.Resampling.LANCZOS))
+
+# --- Main Frame ---
+main_frame = tk.Frame(root, bg="#d3d3d3", padx=10, pady=10)
+main_frame.pack(fill="both", expand=True)
+
+# --- Logo Row ---
+logo_row = tk.Frame(main_frame, bg="#d3d3d3")
+logo_row.pack(fill="x")
+
+tk.Label(logo_row, image=ms_logo, bg="#d3d3d3").pack(side="left")
+tk.Label(logo_row, text="Braze Segment QA Analysis", font=("Arial", 12, "bold"),
+         bg="#d3d3d3").pack(side="left", expand=True)
+tk.Label(logo_row, image=braze_logo, bg="#d3d3d3").pack(side="right")
+
+# --- Two-column layout ---
+form_container = tk.Frame(main_frame, bg="#d3d3d3")
+form_container.pack(pady=(10, 5), fill="x")
+
+# Left column
+left_frame = tk.Frame(form_container, bg="#d3d3d3")
+left_frame.pack(side="left", padx=10, pady=5, fill="both", expand=True)
+
+tk.Label(left_frame, text="Select the type of your Campaign:", font=bold_font, bg="#d3d3d3") \
+    .grid(row=0, column=0, sticky="w", padx=5, pady=2)
+campaign_type_var = tk.StringVar()
+campaign_combo = ttk.Combobox(left_frame, textvariable=campaign_type_var,
+                              values=["Promotional", "Transactional", "Contactable"],
+                              state="readonly", width=40)
+campaign_combo.grid(row=0, column=1, padx=5, pady=2)
+campaign_type_var.set("Promotional")
+
+tk.Label(left_frame, text="Please Enter The Segment API Id:", font=bold_font, bg="#d3d3d3") \
+    .grid(row=1, column=0, sticky="w", padx=5, pady=2)
+segment_id_entry = tk.Entry(left_frame, width=43)
+segment_id_entry.grid(row=1, column=1, padx=5, pady=2)
+
+tk.Label(left_frame, text="Select the type of your MsaCountry:", font=bold_font, bg="#d3d3d3") \
+    .grid(row=2, column=0, sticky="w", padx=5, pady=2)
+msa_country_var = tk.StringVar()
+msa_country_combo = ttk.Combobox(left_frame, textvariable=msa_country_var,
+                                  values=["Standard16", "Cloud", "Rewards","English"],
+                                  state="readonly", width=40)
+msa_country_combo.grid(row=2, column=1, padx=5, pady=2)
+msa_country_var.set("Standard16")
+
+# Right column
+right_frame = tk.Frame(form_container, bg="#d3d3d3")
+right_frame.pack(side="right", padx=10, pady=5, fill="both", expand=True)
+
+
+# --- Right column ---
+tk.Label(right_frame, text="Include Eligible Campaign values (comma-separated):",
+         font=bold_font, bg="#d3d3d3").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+IncludedEligibleCampaignValues = tk.Text(right_frame, height=1, width=43)
+IncludedEligibleCampaignValues.grid(row=0, column=1, padx=5, pady=2)
+
+tk.Label(right_frame, text="Exclude Eligible Campaign values (comma-separated):",
+         font=bold_font, bg="#d3d3d3").grid(row=1, column=0, sticky="w", padx=5, pady=2)
+ExcludedEligibleCampaignValues = tk.Text(right_frame, height=1, width=43)
+ExcludedEligibleCampaignValues.grid(row=1, column=1, padx=5, pady=2)
+
+# --- Validation Logic ---
+def highlight_invalid_values(text_widget):
+    """Highlight invalid 8-char codes in red and return list of invalid values."""
+    text_widget.tag_delete("invalid")
+    text_widget.tag_configure("invalid", foreground="red")
+
+    raw_text = text_widget.get("1.0", "end").strip()
+    parts = [p.strip() for p in raw_text.split(",") if p.strip()]
+
+    text_widget.delete("1.0", "end")
+
+    invalids = []
+    for i, part in enumerate(parts):
+        if len(part) != 8:
+            text_widget.insert("end", part, "invalid")
+            invalids.append(part)
+        else:
+            text_widget.insert("end", part)
+        if i != len(parts) - 1:
+            text_widget.insert("end", ", ")
+
+    return invalids
+
+
+def on_submit():
+    # Clear previous output
+    output_text.delete("1.0", "end")
+
+    invalid_includes = highlight_invalid_values(IncludedEligibleCampaignValues)
+    invalid_excludes = highlight_invalid_values(ExcludedEligibleCampaignValues)
+
+    problems = []
+    if invalid_includes:
+        problems.append("Invalid Included Eligible Campaign values:\n  " + "\n  ".join(invalid_includes))
+    if invalid_excludes:
+        problems.append("Invalid Excluded Eligible Campaign values:\n  " + "\n  ".join(invalid_excludes))
+
+    if problems:
+        report = "Validation FAILED — please fix these values:\n\n" + "\n\n".join(problems)
+        #output_text.insert("end", report)
+        messagebox.showerror("Invalid Input", report)
+        return
+
+    # ✅ Passed
+    success_report = "Validation PASSED — all codes are exactly 8 characters long.\n"
+    #output_text.insert("end", success_report)
+
+    # ⬇️ Correct placement — call analyze_segment() **inside** on_submit only after validation passes
+    analyze_segment()
+
+
+
+
+# --- Run Button ---
+tk.Button(main_frame, text="Run QA Check", command=on_submit,
+           font=("Arial", 10, "bold"), bg="#4db8b8", fg="white",
+           relief="flat", padx=10, pady=5).pack(pady=(10, 5), ipadx=10, ipady=2)
+
+
+# --- Output Frame ---
+output_frame = tk.Frame(main_frame)
+output_frame.pack(fill="both", expand=True, pady=(5, 0), padx=5)
+
+scrollbar = tk.Scrollbar(output_frame)
+scrollbar.pack(side="right", fill="y")
+
+output_text = tk.Text(output_frame, height=10, font=("Arial", 10),
+                      bg="white", yscrollcommand=scrollbar.set, wrap="word")
+output_text.pack(side="left", fill="both", expand=True)
+scrollbar.config(command=output_text.yview)
+
+# Keep image references
+root.ms_logo = ms_logo
+root.braze_logo = braze_logo
+
+root.mainloop()
