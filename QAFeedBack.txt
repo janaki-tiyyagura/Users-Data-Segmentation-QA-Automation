@@ -1,0 +1,164 @@
+
+*************** BLOCK 1 ***************
+
+✅ All Promotional Campaign conditions are present.
+ Applied Conditions:
+1. email subscription status is opted_in
+2. IsPromoEligible equals True
+3. AgeGroup equals 18+
+4. AccountCreatedDate is more than 6 days ago
+5. email address is not blank
+
+
+📌IsPromoEligible
+  -Comparision Operator: equals
+  -Provided Values: ['True']
+  -✅ No Space Issues: ['True']
+
+
+📌AgeGroup
+  -Comparision Operator: equals
+  -Provided Values: ['18+']
+  -✅ Matching: ['18+']
+
+
+📌Locale
+  -Comparision Operator: is any of
+  -Provided Values: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+  -✅ Matching: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+
+
+📌AccountCreatedDate
+  -Comparision Operator: more than
+  -Provided Value: 6 days ago
+
+
+📌Including Segment "13MonthsResponders"
+
+
+📌EmailDomain
+  -Comparision Operator: doesn't contain any of
+  -Provided Values: ['hotmail', 'microsoft', 'msn', 'live', 'outlook', 'xyz']
+  -✅ Matching: ['hotmail', 'microsoft', 'msn', 'live', 'outlook', 'xyz']
+
+
+📌Eligible_Campaign
+  -Comparision Operator: includes value
+  -Provided Values: ['14692803']
+  -✅ Matching: ['14692803']
+
+
+
+*************** BLOCK 2 ***************
+
+✅ All Promotional Campaign conditions are present.
+ Applied Conditions:
+1. email subscription status is opted_in
+2. IsPromoEligible equals True
+3. AgeGroup equals 18+
+4. AccountCreatedDate is more than 6 days ago
+5. email address is not blank
+
+
+📌IsPromoEligible
+  -Comparision Operator: equals
+  -Provided Values: ['True']
+  -✅ No Space Issues: ['True']
+
+
+📌AgeGroup
+  -Comparision Operator: equals
+  -Provided Values: ['18+']
+  -✅ Matching: ['18+']
+
+
+📌AccountCreatedDate
+  -Comparision Operator: more than
+  -Provided Value: 6 days ago
+
+
+📌Including Segment "9MonthsResponders"
+
+
+📌EmailDomain
+  -Comparision Operator: contains any of
+  -Provided Values: ['hotmail', 'microsoft', 'msn', 'live']
+  -✅ Matching: ['hotmail', 'microsoft', 'msn', 'live']
+
+
+📌Eligible_Campaign
+  -Comparision Operator: includes value
+  -Provided Values: ['14692803']
+  -✅ Matching: ['14692803']
+
+
+📌Locale
+  -Comparision Operator: is any of
+  -Provided Values: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+  -✅ Matching: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+
+
+
+*************** BLOCK 3 ***************
+
+✅ All Promotional Campaign conditions are present.
+ Applied Conditions:
+1. email subscription status is opted_in
+2. IsPromoEligible equals True
+3. AgeGroup equals 18+
+4. AccountCreatedDate is more than 6 days ago
+5. email address is not blank
+
+
+📌IsPromoEligible
+  -Comparision Operator: equals
+  -Provided Values: ['True']
+  -✅ No Space Issues: ['True']
+
+
+📌AgeGroup
+  -Comparision Operator: equals
+  -Provided Values: ['18+']
+  -✅ Matching: ['18+']
+
+
+📌AccountCreatedDate
+  -Comparision Operator: more than
+  -Provided Value: 6 days ago
+
+
+📌Including Segment "6MonthsResponders"
+
+
+📌EmailDomain
+  -Comparision Operator: contains any of
+  -Provided Values: ['outlook']
+  -✅ Matching: ['outlook']
+
+
+📌Eligible_Campaign
+  -Comparision Operator: includes value
+  -Provided Values: ['14692803']
+  -✅ Matching: ['14692803']
+
+
+📌Locale
+  -Comparision Operator: is any of
+  -Provided Values: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+  -✅ Matching: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+
+
+
+************************* EXCLUSION GROUP *************************
+
+*************** BLOCK 4 ***************
+
+✅Soft Bounce Exclusion Condition Correctly Present. i.e., has had more than 2 soft bounces in the last 30 calendar days (720-744 hours) 
+
+
+📌Eligible_Campaign
+  -Comparision Operator: includes any of
+  -Provided Values: ['14692801', '14692802']
+  -✅ Matching: ['14692801', '14692802']
+
+
