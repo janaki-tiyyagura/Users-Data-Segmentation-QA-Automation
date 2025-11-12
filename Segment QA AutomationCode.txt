@@ -485,7 +485,7 @@ def analyze_segment():
     Include_Eligible_Campaign_Values = IncludedEligibleCampaignValues.get("1.0", "end").strip()
     Exclude_Eligible_Campaign_Values = ExcludedEligibleCampaignValues.get("1.0", "end").strip()
 
-    api_key = "786ab5e2-2891-475c-8f19-fb9f7c4d139d"  
+    api_key = "replaced"  
     segment_id = segment_id_entry.get().strip()
     output_text.delete('1.0', tk.END)
     output_text.insert(tk.END, f"Campaign Type: {campaign_type_var.get()}\n")
@@ -1022,5 +1022,6 @@ scrollbar.config(command=output_text.yview)
 # Keep image references
 root.ms_logo = ms_logo
 root.braze_logo = braze_logo
+
 
 root.mainloop()
