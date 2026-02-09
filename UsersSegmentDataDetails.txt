@@ -1,12 +1,12 @@
 Description: ((email subscription status is opted_in 
 and IsPromoEligible equals True 
 and AgeGroup equals 18+ 
-and Locale is any of de-DE, en-CA, en-GB, en-US, es-ES, fr-CA, nl-NL, fr-FR, it-IT 
 and AccountCreatedDate is more than 6 days ago 
 and is in Segment "13MonthsResponders" 
 and EmailDomain doesn't contain any of hotmail, microsoft, msn, live, outlook, xyz 
 and email address is not blank 
-and Eligible_Campaign includes value 14692803) 
+and Eligible_Campaign includes value 15775702 
+and MsaCountry is any of ZA, AU, CA, HK, IN, UK, US) 
 or (email subscription status is opted_in 
 and IsPromoEligible equals True 
 and AgeGroup equals 18+ 
@@ -14,8 +14,8 @@ and AccountCreatedDate is more than 6 days ago
 and is in Segment "9MonthsResponders" 
 and EmailDomain contains any of hotmail, microsoft, msn, live 
 and email address is not blank 
-and Eligible_Campaign includes value 14692803 
-and Locale is any of de-DE, en-CA, en-GB, en-US, es-ES, fr-CA, nl-NL, fr-FR, it-IT) 
+and Eligible_Campaign includes value 15775702 
+and MsaCountry is any of ZA, AU, CA, HK, IN, UK, US) 
 or (email subscription status is opted_in 
 and IsPromoEligible equals True 
 and AgeGroup equals 18+ 
@@ -23,7 +23,11 @@ and AccountCreatedDate is more than 6 days ago
 and is in Segment "6MonthsResponders" 
 and EmailDomain contains any of outlook 
 and email address is not blank 
-and Eligible_Campaign includes value 14692803 
-and Locale is any of de-DE, en-CA, en-GB, en-US, es-ES, fr-CA, nl-NL, fr-FR, it-IT)) 
-and not (has had more than 2 soft bounces in the last 30 calendar days (720-744 hours) 
-or Eligible_Campaign includes any of 14692801, 14692802)
+and Eligible_Campaign includes value 15775702 
+and MsaCountry is any of ZA, AU, CA, HK, IN, UK, US)) 
+and not ((has had more than 2 soft bounces in the last 30 calendar days (720-744 hours) 
+or IPGeoState equals quebec) 
+and not (MsaCountry equals CA 
+and Locale equals fr-CA) 
+and not (MsaCountry equals HK 
+and Locale equals zh-HK))
