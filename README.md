@@ -45,6 +45,11 @@ A simple **GUI interface** enables non-technical users to run QA checks easily.
 
 Ideal for **campaign managers, QA analysts, and marketing operations teams** who need reliable, repeatable, and scalable validation of segmentation logic before campaign execution.
 
+
+<img width="1007" height="485" alt="image" src="https://github.com/user-attachments/assets/1e3617a0-a58e-492a-b47d-f0993eb2da50" />
+
+
+
 <img width="1365" height="664" alt="image" src="https://github.com/user-attachments/assets/21737644-7715-4b0b-9b18-3529f18d7858" />
 <img width="1365" height="472" alt="image" src="https://github.com/user-attachments/assets/10523532-d261-4975-b2ce-5dd3f3e60c41" />
 <img width="1365" height="660" alt="image" src="https://github.com/user-attachments/assets/49289d8d-86bd-43eb-9562-d62d43836854" />
