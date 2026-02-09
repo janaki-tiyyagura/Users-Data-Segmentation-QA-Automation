@@ -22,12 +22,6 @@
   -✅ Matching: ['18+']
 
 
-📌Locale
-  -Comparision Operator: is any of
-  -Provided Values: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
-  -✅ Matching: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
-
-
 📌AccountCreatedDate
   -Comparision Operator: more than
   -Provided Value: 6 days ago
@@ -44,8 +38,14 @@
 
 📌Eligible_Campaign
   -Comparision Operator: includes value
-  -Provided Values: ['14692803']
-  -✅ Matching: ['14692803']
+  -Provided Values: ['15775702']
+  -✅ Matching: ['15775702']
+
+
+📌MsaCountry
+  -Comparision Operator: is any of
+  -Provided Values: ['ZA', 'AU', 'CA', 'HK', 'IN', 'UK', 'US']
+  -✅ Matching: ['ZA', 'AU', 'CA', 'HK', 'IN', 'UK', 'US']
 
 
 
@@ -88,14 +88,14 @@
 
 📌Eligible_Campaign
   -Comparision Operator: includes value
-  -Provided Values: ['14692803']
-  -✅ Matching: ['14692803']
+  -Provided Values: ['15775702']
+  -✅ Matching: ['15775702']
 
 
-📌Locale
+📌MsaCountry
   -Comparision Operator: is any of
-  -Provided Values: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
-  -✅ Matching: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+  -Provided Values: ['ZA', 'AU', 'CA', 'HK', 'IN', 'UK', 'US']
+  -✅ Matching: ['ZA', 'AU', 'CA', 'HK', 'IN', 'UK', 'US']
 
 
 
@@ -138,14 +138,14 @@
 
 📌Eligible_Campaign
   -Comparision Operator: includes value
-  -Provided Values: ['14692803']
-  -✅ Matching: ['14692803']
+  -Provided Values: ['15775702']
+  -✅ Matching: ['15775702']
 
 
-📌Locale
+📌MsaCountry
   -Comparision Operator: is any of
-  -Provided Values: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
-  -✅ Matching: ['de-DE', 'en-CA', 'en-GB', 'en-US', 'es-ES', 'fr-CA', 'nl-NL', 'fr-FR', 'it-IT']
+  -Provided Values: ['ZA', 'AU', 'CA', 'HK', 'IN', 'UK', 'US']
+  -✅ Matching: ['ZA', 'AU', 'CA', 'HK', 'IN', 'UK', 'US']
 
 
 
@@ -156,9 +156,52 @@
 ✅Soft Bounce Exclusion Condition Correctly Present. i.e., has had more than 2 soft bounces in the last 30 calendar days (720-744 hours) 
 
 
-📌Eligible_Campaign
-  -Comparision Operator: includes any of
-  -Provided Values: ['14692801', '14692802']
-  -✅ Matching: ['14692801', '14692802']
+📌IPGeoState
+  -Comparision Operator: equals
+  -Provided Values: ['quebec']
+  -✅ Matching: ['quebec']
+
+
+
+*************** BLOCK 5 ***************
+
+📌MsaCountry
+  -Comparision Operator: equals
+  -Provided Values: ['CA']
+  -✅ Matching: ['CA']
+
+
+📌Locale
+  -Comparision Operator: equals
+  -Provided Values: ['fr-CA']
+  -✅ Matching: ['fr-CA']
+
+
+
+*************** BLOCK 6 ***************
+
+📌MsaCountry
+  -Comparision Operator: equals
+  -Provided Values: ['HK']
+  -✅ Matching: ['HK']
+
+
+📌Locale
+  -Comparision Operator: equals
+  -Provided Values: ['zh-HK']
+  -✅ Matching: ['zh-HK']
+
+
+✅English CA Market Suppression Conditions are applied
+ Applied Conditions:
+1. IPGeoState equals quebec
+2. MsaCountry equals CA
+3. Locale equals fr-CA
+
+
+✅English HK Market Suppression Conditions are applied
+ Applied Conditions:
+1. MsaCountry equals HK
+2. Locale equals zh-HK
 
 
